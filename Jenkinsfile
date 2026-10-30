@@ -172,13 +172,26 @@ PY
                         if (env.DEPLOYMATE_DECISION == "BLOCK") {
                             error("CRITICAL: DeployMate-II BLOCKED this deployment due to high risk.")
                         } else if (env.DEPLOYMATE_DECISION == "REVIEW") {
-                            echo "WARNING: Risk score is elevated. Proceeding under REVIEW mode."
+                            echo "WARNING: Risk score is elevated. Routing to Manual Approval Gate..."
                         } else {
                             echo "SUCCESS: Deployment APPROVED by DeployMate-II."
                         }
                     }
                 }
                 archiveArtifacts artifacts: 'assessment-result.json', allowEmptyArchive: true
+            }
+        }
+
+        stage('Manual Approval Gate') {
+            when {
+                environment name: 'DEPLOYMATE_DECISION', value: 'REVIEW'
+            }
+            steps {
+                script {
+                    echo "DeployMate-II detected elevated risk. Pausing for human authorization..."
+                    input message: "DeployMate-II flagged this build as REVIEW. Do you authorize deployment?",
+                          ok: "Approve & Deploy"
+                }
             }
         }
 
