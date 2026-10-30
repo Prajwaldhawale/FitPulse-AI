@@ -182,17 +182,107 @@ PY
             }
         }
 
-        stage('Manual Approval Gate') {
+        stage('DeployMate Dashboard Authorization') {
             when {
                 expression {
                     return env.DEPLOYMATE_DECISION == 'REVIEW'
                 }
             }
             steps {
-                script {
-                    echo "DeployMate-II detected elevated risk. Pausing for human authorization..."
-                    input message: "DeployMate-II flagged this build as REVIEW. Do you authorize deployment?",
-                          ok: "Approve & Deploy"
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'deploymate-ci',
+                        usernameVariable: 'DEPLOYMATE_EMAIL',
+                        passwordVariable: 'DEPLOYMATE_PASSWORD'
+                    )
+                ]) {
+                    script {
+                        echo ""
+                        echo "=================================================================="
+                        echo "DEPLOYMATE-II GATE: MANUAL AUTHORIZATION REQUIRED"
+                        echo "Risk was assessed as REVIEW. Open the DeployMate-II Dashboard to"
+                        echo "review Bedrock AI insights and Authorize or Reject this release:"
+                        echo "👉 http://54.221.35.6"
+                        echo "=================================================================="
+                        echo ""
+
+                        sh '''
+                            python3 - <<'PY'
+import json
+import os
+import sys
+import time
+import urllib.request
+import urllib.error
+
+base = os.environ["DEPLOYMATE_URL"].rstrip("/")
+
+def api_call(url, data_dict=None, token=None):
+    headers = {"Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = "Bearer " + token
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(data_dict).encode("utf-8") if data_dict else None,
+        headers=headers,
+        method="POST" if data_dict else "GET"
+    )
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+# Load assessment ID
+with open("assessment-result.json") as f:
+    assessment_data = json.load(f)
+assessment_id = assessment_data["id"]
+
+# Login
+login_resp = api_call(base + "/auth/login", {
+    "email": os.environ["DEPLOYMATE_EMAIL"],
+    "password": os.environ["DEPLOYMATE_PASSWORD"]
+})
+token = login_resp["access_token"]
+
+# Polling loop (checks every 5s, max 120 attempts = 10 minutes)
+print(f"[POLL] Awaiting decision on Assessment #{assessment_id} in DeployMate Dashboard...")
+
+for attempt in range(1, 121):
+    record = api_call(base + "/assessments/" + str(assessment_id), token=token)
+    decision = str(record.get("decision", "")).upper()
+
+    if decision in ("APPROVED_BY_LEAD", "APPROVE"):
+        print("")
+        print("==========================================================")
+        print("RELEASE AUTHORIZED via DeployMate-II Dashboard!")
+        print("Final Status:", decision)
+        print("==========================================================")
+        print("")
+        with open("decision.txt", "w") as f:
+            f.write(decision)
+        sys.exit(0)
+    elif decision in ("REJECTED_BY_LEAD", "BLOCK"):
+        print("")
+        print("==========================================================")
+        print("RELEASE REJECTED via DeployMate-II Dashboard!")
+        print("Final Status:", decision)
+        print("==========================================================")
+        print("")
+        with open("decision.txt", "w") as f:
+            f.write(decision)
+        sys.exit(1)
+
+    if attempt % 6 == 0:
+        elapsed = attempt * 5
+        print(f"[POLL] Waiting for Lead authorization on http://54.221.35.6 ({elapsed}s elapsed)...")
+    time.sleep(5)
+
+print("[TIMEOUT] No decision received from DeployMate Dashboard after 10 minutes.")
+sys.exit(1)
+PY
+                        '''
+
+                        env.DEPLOYMATE_DECISION = readFile('decision.txt').trim()
+                        echo "Final Decision: ${env.DEPLOYMATE_DECISION}"
+                    }
                 }
             }
         }
@@ -200,7 +290,7 @@ PY
         stage('Deploy FitPulse') {
             when {
                 expression {
-                    return env.DEPLOYMATE_DECISION == 'APPROVE' || env.DEPLOYMATE_DECISION == 'REVIEW'
+                    return env.DEPLOYMATE_DECISION == 'APPROVE' || env.DEPLOYMATE_DECISION == 'APPROVED_BY_LEAD'
                 }
             }
             steps {
