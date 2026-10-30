@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitPulse AI — Progressive Overload & Hypertrophy Tracker</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-brand">
+            <div class="logo-icon">⚡</div>
+            <div>
+                <h1>FitPulse<span>AI</span></h1>
+                <p>PROGRESSIVE OVERLOAD & COACH INTELLIGENCE</p>
+            </div>
+        </div>
+        <div class="nav-badge">
+            <span class="pulse-dot"></span>
+            Deployed via DeployMate-II CI/CD
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Hero Metrics Grid -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span>RECOVERY SCORE</span>
+                    <span class="stat-icon green-icon">⚡</span>
+                </div>
+                <div class="stat-value" id="recovery-score">—</div>
+                <div class="stat-subtext" id="recovery-readiness">Calculating...</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span>DAILY PROTEIN</span>
+                    <span class="stat-icon blue-icon">🍗</span>
+                </div>
+                <div class="stat-value" id="protein-val">—</div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="protein-bar" style="width: 0%"></div>
+                </div>
+                <div class="stat-subtext" id="protein-target">Target: 160g</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span>BODY MASS INDEX</span>
+                    <span class="stat-icon purple-icon">⚖</span>
+                </div>
+                <div class="stat-value" id="bmi-val">—</div>
+                <div class="stat-subtext" id="bmi-category">Height: — · Weight: —</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span>OVERLOAD BREAKTHROUGHS</span>
+                    <span class="stat-icon orange-icon">🔥</span>
+                </div>
+                <div class="stat-value" id="overload-count">—</div>
+                <div class="stat-subtext" id="total-sets">Total sets: —</div>
+            </div>
+        </section>
+
+        <!-- Main Workspace -->
+        <div class="workspace-grid">
+            <!-- Left: Workout Logger -->
+            <section class="card">
+                <div class="card-title">
+                    <span>🏋️</span> Log Workout Set
+                </div>
+                <form id="workout-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="exercise-name">Exercise</label>
+                            <input type="text" id="exercise-name" list="exercise-suggestions" placeholder="e.g. Barbell Bench Press" required>
+                            <datalist id="exercise-suggestions">
+                                <option value="Barbell Bench Press">
+                                <option value="Incline Dumbbell Press">
+                                <option value="Barbell Back Squat">
+                                <option value="Romanian Deadlift">
+                                <option value="Overhead Barbell Press">
+                                <option value="Pull-ups / Lat Pulldown">
+                                <option value="Barbell Bent-Over Row">
+                                <option value="Dumbbell Lateral Raise">
+                            </datalist>
+                        </div>
+                        <div class="form-group">
+                            <label for="muscle-group">Muscle Group</label>
+                            <select id="muscle-group">
+                                <option value="Chest">Chest</option>
+                                <option value="Back">Back</option>
+                                <option value="Legs">Legs</option>
+                                <option value="Shoulders">Shoulders</option>
+                                <option value="Arms">Arms</option>
+                                <option value="Core">Core</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="weight-kg">Weight (kg)</label>
+                            <input type="number" step="0.5" id="weight-kg" placeholder="80" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reps">Reps</label>
+                            <input type="number" id="reps" placeholder="8" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="log-workout-btn">
+                        🔥 Log Set & Check Overload
+                    </button>
+                    <div id="workout-feedback" class="feedback-msg"></div>
+                </form>
+            </section>
+
+            <!-- Right: Daily Fuel & Habits -->
+            <section class="card">
+                <div class="card-title">
+                    <span>💧</span> Daily Recovery & Metrics
+                </div>
+                <form id="habits-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="protein-input">Protein (grams)</label>
+                            <input type="number" id="protein-input" placeholder="150" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="water-input">Water (Liters)</label>
+                            <input type="number" step="0.1" id="water-input" placeholder="3.0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sleep-input">Sleep (Hours)</label>
+                            <input type="number" step="0.5" id="sleep-input" placeholder="7.5" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="height-input">Height (cm)</label>
+                            <input type="number" step="0.5" id="height-input" placeholder="178">
+                        </div>
+                        <div class="form-group">
+                            <label for="weight-input">Body Weight (kg)</label>
+                            <input type="number" step="0.1" id="weight-input" placeholder="75.0">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-secondary">
+                        💾 Update Fuel & Body Stats
+                    </button>
+                    <div id="habits-feedback" class="feedback-msg"></div>
+                </form>
+            </section>
+        </div>
+
+        <!-- AI Personal Trainer Card -->
+        <section class="card ai-coach-card">
+            <div class="ai-header">
+                <div class="ai-title">
+                    <span class="ai-spark">✦</span> Coach Iron · AI Personal Trainer
+                </div>
+                <button class="btn btn-ai" id="ask-ai-btn">
+                    <span>⚡</span> Analyze My Workouts & Recovery
+                </button>
+            </div>
+
+            <div class="ai-body" id="ai-response-box">
+                <div class="ai-placeholder">
+                    Click <strong>"Analyze My Workouts & Recovery"</strong> to have Coach Iron analyze your progressive overload and recovery metrics using Amazon Bedrock.
+                </div>
+            </div>
+        </section>
+
+        <!-- Workout History Table -->
+        <section class="card">
+            <div class="card-title">
+                <span>📋</span> Progressive Overload Training History
+            </div>
+            <div class="table-container">
+                <table class="workout-table">
+                    <thead>
+                        <tr>
+                            <th>EXERCISE</th>
+                            <th>MUSCLE</th>
+                            <th>WEIGHT × REPS</th>
+                            <th>EST. 1-REP MAX</th>
+                            <th>OVERLOAD STATUS</th>
+                            <th>DATE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="workout-tbody">
+                        <tr><td colspan="6" class="loading-td">Loading workout logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
