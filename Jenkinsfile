@@ -184,7 +184,9 @@ PY
 
         stage('Manual Approval Gate') {
             when {
-                environment name: 'DEPLOYMATE_DECISION', value: 'REVIEW'
+                expression {
+                    return env.DEPLOYMATE_DECISION == 'REVIEW'
+                }
             }
             steps {
                 script {
