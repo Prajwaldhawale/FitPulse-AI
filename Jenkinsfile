@@ -150,11 +150,13 @@ except Exception as e:
 decision = str(result.get("decision", "BLOCK")).upper()
 risk_score = result.get("risk_score", 0)
 
-print("\n==========================================")
-print(f"DEPLOYMATE-II ASSESSMENT DECISION: {decision}")
-print(f"RISK SCORE: {risk_score} / 100")
-print(f"SECURITY FINDINGS: {findings}")
-print("==========================================\n")
+print("")
+print("==========================================")
+print("DEPLOYMATE-II ASSESSMENT DECISION:", decision)
+print("RISK SCORE:", risk_score)
+print("SECURITY FINDINGS:", findings)
+print("==========================================")
+print("")
 
 with open("decision.txt", "w") as f:
     f.write(decision)
