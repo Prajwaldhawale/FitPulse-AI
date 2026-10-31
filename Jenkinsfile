@@ -11,7 +11,7 @@ pipeline {
     }
 
     environment {
-        DEPLOYMATE_URL = "http://54.221.35.6/api"
+        DEPLOYMATE_URL = "http://127.0.0.1/api"
         APP_NAME = "FitPulse-AI"
         APP_PORT = "3000"
         IMAGE_NAME = "fitpulse-ai"
@@ -202,7 +202,7 @@ PY
                         echo "DEPLOYMATE-II GATE: MANUAL AUTHORIZATION REQUIRED"
                         echo "Risk was assessed as REVIEW. Open the DeployMate-II Dashboard to"
                         echo "review Bedrock AI insights and Authorize or Reject this release:"
-                        echo "👉 http://54.221.35.6"
+                        echo "👉 http://54.144.253.111"
                         echo "=================================================================="
                         echo ""
 
@@ -272,7 +272,7 @@ for attempt in range(1, 121):
 
     if attempt % 6 == 0:
         elapsed = attempt * 5
-        print(f"[POLL] Waiting for Lead authorization on http://54.221.35.6 ({elapsed}s elapsed)...")
+        print(f"[POLL] Waiting for Lead authorization on http://54.144.253.111 ({elapsed}s elapsed)...")
     time.sleep(5)
 
 print("[TIMEOUT] No decision received from DeployMate Dashboard after 10 minutes.")
