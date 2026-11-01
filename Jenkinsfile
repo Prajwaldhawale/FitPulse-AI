@@ -116,6 +116,7 @@ except Exception as e:
 
 # 2. Parse Trivy findings
 findings = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+security_details = []
 if os.path.exists("trivy-report.json"):
     try:
         with open("trivy-report.json") as f:
@@ -125,6 +126,14 @@ if os.path.exists("trivy-report.json"):
                 sev = v.get("Severity", "").lower()
                 if sev in findings:
                     findings[sev] += 1
+                security_details.append({
+                    "id": v.get("VulnerabilityID", "unknown"),
+                    "package": v.get("PkgName", "unknown"),
+                    "installed_version": v.get("InstalledVersion", "unknown"),
+                    "fixed_version": v.get("FixedVersion", "not provided"),
+                    "severity": v.get("Severity", "unknown"),
+                    "title": v.get("Title", ""),
+                })
     except Exception as e:
         print(f"[WARN] Failed to parse Trivy report: {e}", file=sys.stderr)
 
@@ -137,6 +146,7 @@ payload = {
     "build_status": "SUCCESS",
     "test_status": "PASS",
     "security_findings": findings,
+    "security_details": security_details[:100],
     "infrastructure_metrics": {"cpu_usage_percent": 35.0, "memory_usage_percent": 45.0},
     "recent_failures": 0
 }
